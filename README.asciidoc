@@ -1,0 +1,287 @@
+= Gradle SonarQube Plugin for Intershop Components
+:latestRevision: 1.0.0
+:toc:
+
+== Summary
+
+This plugin applies the code analysis with SonarQube to an Intershop multi project. An Intershop cartridge is from the SonarQube
+perspective a multi module project, because it contains java files, css files, javascript files and other code
+artifacts. Each kind of these artifacts can be analyzed by SonarQube. In the future Intershop wants deliver additional
+SonarQube plugins for special code artifacts. Currently SonarQube supports java, css and javascript.
+
+Different from the standard Gradle SonarQube-Runner each Intershop component is analyzed in a separate project. The
+Intershop plugin uses the base configuration like the standard Gradle SonarQube-Runner (see sonarProperties).
+
+== Usage
+
+IMPORTANT: This plugin needs always a connection to the SonarQube-Server and is not working without this. It is
+possible to disable the code analysis for all projects with the setting of the project property `skipSonar`.
+
+To apply the Intershop SonarQube plugin to your Intershop projects, add the following in your build script:
+
+[source,groovy,subs="attributes"]
+----
+apply plugin: 'intershop-sonar'
+
+sonarqube {
+
+    verbose = true
+
+    sonarProperties {
+        property 'sonar.host.url', 'http://sonarhost:9000'
+        //optional
+        //property 'sonar.login', '<login name>'
+        //property 'sonar.password', '<login password>'
+    }
+
+}
+
+buildscript {
+    dependencies {
+        classpath group: 'com.intershop.build', name: 'intershop-sonar-plugin', version: '{latestRevision}'
+    }
+}
+----
+
+Optionally, coverage data from integration tests can be uploaded with using the sonarPropery 'java.sonar.jacoco.itReportPath'.
+
+The following snippet of a build.gradle shows the definition of a task for collecting related jacoco data files and an example
+for the configuration of the sonarqube task for related sub projects.
+
+[source,groovy,subs="attributes"]
+----
+
+// required for the JacocoMerge Task
+apply plugin: 'jacoco'
+
+// JacocoMerge task for merging all related jacoco data files
+Task collectIntegCoverageDataTask = tasks.create('collectIntegCoverageData', JacocoMerge, {
+    destinationFile(new File(buildDir, 'jacoco/integTest.exec'))
+
+    executionData rootProject.fileTree('.', {
+        include '**/jacoco/ishUnitTest.exec'
+    })
+})
+
+subprojects {
+
+    // supposed, the name of your asemblies are stored within a collection
+    if (!assemblies.contains(name)) {
+        apply plugin: 'com.intershop.build.sonarQube'
+
+        tasks.sonarqube.dependsOn collectIntegCoverageDataTask
+
+        sonarqube {
+            sonarProperties {
+                property 'java.sonar.jacoco.itReportPath',
+                new File(rootProject.buildDir, 'jacoco/integTest.exec').absolutePath
+            }
+        }
+    }
+}
+----
+
+
+== Tasks
+The Intershop SonarQube plugin adds the task `sonarqube` to all projects. The task will be only executed for sub projects.
+
+NOTE: It is necessary for the analysis to specify the project property `branchVersion`. If this is not specified, `trunk` is used instead.
+
+== Project Extension 'sonarqube'
+This plugin adds an extension `sonarqube` to the project.
+
+=== Properties
+[cols="17%,17%,17%,68%", width="90%", options="header"]
+|===
+|Property | Type | Default value | Description
+
+|*modules*     |`List`     | ['java','js','css'] | This is a list of possible configurations. Remove 'js' or' css, if only Java should to be analyzed.
+|*runOnCI*     |`boolean`  | false               | This configuration must be true, if the project is used on a CI server. +
+                                                   _This can be overwritten by the system or environment variable `RUNONCI` or project property `runOnCI`._
+|*toolVersion* |`String`   | '2.5.1'               | The version of the SonarQube Runner. (See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner)
+|*skipProject* |`boolean`  | false               | If this value is true, the project will be not analyzed.
+|*verbose*     |`boolean`  | false               | The output of the SonarQube Runner will be extended, if this value is true.
+|===
+
+=== Methods
+|Method | Values | Description
+|===
+|*sonarProperties* |`<<SonarProperties,SonarProperties>>` | Addtional Sonar configuration properties
+|*forkOptions*     |`<<JavaForkOptions,JavaForkOptions>>` | The SonarQube Runner is executed in a forkde process. This allows fine grained control over memory
+settings and system properties for the SonarQube Runner process.
+|===
+
+=== [[SonarProperties]]Object 'sonarProperties' - Additional SonarQube analysis configuration
+[cols="20%,25%,55%", width="90%, options="header"]
+|===
+|Method     | Parameter           | Description
+
+|*property* | `String`, `Object`  | Adds an additional SonarQube configuration property. It is also possible to add an own module configuration.
+|===
+
+=== [[JavaForkOptions]]Object 'forkOptions' - Controlling the SonarQube Runner process
+For a complete reference about the available options, see https://docs.gradle.org/current/javadoc/org/gradle/process/JavaForkOptions.html[JavaForkOptions].
+
+== Setting SonarQube Properties from the Command Line
+SonarQube properties can also set from the command line. The properties must be configured as system properties named exactly like the SonarQube property.
+This can be usefull for dealing with sensitive information, like password and internal host names.
+
+[source]
+----
+gradle sonarqube -Dsonar.host.url=http://sonarhost.mycompany.com -Dsonar.jdbc.password=myPassword
+----
+
+It also possible to specify this values in a special `gradle.properties` file
+
+.gradle.properties
+[source]
+----
+systemProp.sonar.host.url = http://sonarhost:9000
+#optional
+#systemProp.sonar.login=<name>
+#systemProp.sonar.password=<password>
+----
+
+=== Defaults for SonarQube properties
+This is always for sub projects of a multi project build. Information about the multi-project will not be stored on the server sonarqube.
+
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|sonar.projectKey          | "${project.group}:${project.name}"
+|sonar.projectName         | project.name
+|sonar.projectDescription  | project.description
+|sonar.projectVersion      | project.ext.branchVersion
+|sonar.projectBaseDir      | project.projectDir
+|sonar.working.directory   | &lt;$project.buildDir/sonar&gt;
+|sonar.dynamicAnalysis     | &lt;reuseReports&gt;
+|===
+
+==== Defaults when the java-base plugin is applied
+
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|sonar.java.source	| project.sourceCompatibility
+|sonar.java.target	| project.targetCompatibility
+|java.sonar.projectName | Java
+|java.sonar.language    | java
+|java.sonar.sources	   | sourceSets.main.allSource.srcDirs (filtered to only include existing directories)
+|java.sonar.tests	   | sourceSets.test.allSource.srcDirs (filtered to only include existing directories)
+|java.sonar.binaries	   | sourceSets.main.runtimeClasspath (filtered to only include directories)
+|sonar.libraries	       | sourceSets.main.runtimeClasspath (filtering to only include files; rt.jar added if necessary)
+|sonar.surefire.reportsPath	| test.testResultsDir (if the directory exists)
+|sonar.junit.reportsPath	    | test.testResultsDir (if the directory exists)
+|===
+
+==== Defaults when the jacoco plugin is applied
+
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|sonar.java.coveragePlugin     | jacoco
+|java.sonar.jacoco.reportPath  | jacoco.destinationFile
+|===
+
+==== Defaults for Intershop Artifacts
+.Intershop Pipelet Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|pipelets.sonar.projectName | Pipelets
+|pipelets.sonar.sources     | sourceSets.main.allSource.srcDirs (filtered to only include existing directories)
+|pipelets.sonar.binaries    | sourceSets.main.runtimeClasspath (filtered to only include directories)
+|pipelets.sonar.projectBaseDir | project.projectDir
+|pipelets.sonar.language | pplet
+|===
+
+.Intershop Pagelet Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|pagelets.sonar.projectName | Pagelets
+|pagelets.sonar.sources     | 'staticfiles/cartridge/pagelets'
+|pagelets.sonar.projectBaseDir | 'staticfiles/cartridge/pagelets'
+|pagelets.sonar.language | pglet
+|===
+
+.Intershop Template Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|templates.sonar.projectName | Templates
+|templates.sonar.sources     | 'staticfiles/cartridge/templates'
+|templates.sonar.projectBaseDir | 'staticfiles/cartridge/templates'
+|templates.sonar.language | isml
+|===
+
+.Intershop Pipeline Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|pipelines.sonar.projectName | Pipelines
+|pipelines.sonar.sources     | 'staticfiles/cartridge/pipelines'
+|pipelines.sonar.projectBaseDir | 'staticfiles/cartridge/pipelines'
+|pipelines.sonar.language | pline
+|===
+
+.Intershop Javascript Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|js.sonar.projectName | Javascript
+|js.sonar.sources     | 'staticfiles/cartridge/static'
+|js.sonar.projectBaseDir | 'staticfiles/cartridge/static'
+|js.sonar.language | js
+|===
+
+.Intershop CSS Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|css.sonar.projectName | CSS
+|css.sonar.sources     | 'staticfiles/cartridge/static'
+|css.sonar.projectBaseDir | 'staticfiles/cartridge/static'
+|css.sonar.language | css
+|===
+
+.Intershop Query Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|queries.sonar.projectName | Query
+|queries.sonar.sources     | 'staticfiles/cartridge/queries'
+|queries.sonar.projectBaseDir | 'staticfiles/cartridge/queries'
+|queries.sonar.language | query
+|===
+
+.Intershop WebForm Artifacts
+[cols="35%,65%", width="90%", options="header"]
+|===
+|Property | Default
+
+|webforms.sonar.projectName | Webform
+|webforms.sonar.sources     | 'staticfiles/cartridge/webforms'
+|webforms.sonar.projectBaseDir | 'staticfiles/cartridge/webforms'
+|webforms.sonar.language | webfm
+|===
+
+== License
+
+Copyright 2014-2016 Intershop Communications.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.

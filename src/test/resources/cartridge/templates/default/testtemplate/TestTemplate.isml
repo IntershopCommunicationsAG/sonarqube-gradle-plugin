@@ -1,0 +1,157 @@
+<iscontent type="text/html" charset="UTF-8" compact="true">
+<ISBreadcrumbTrail id="#DashboardBO:ID#" link="#URL(Action('ViewDashboard-Show'), Parameter('DashboardID', DashboardBO:ID))#" text="#DashboardBO:DisplayName#" start="true" listview="true">
+
+<!--- initialize iframe-bridge for client-side widget API --->
+<isplacement placeholderid="JSWebLibraries">bridge/bridge.js</isplacement>
+<isplacement placeholderid="JSWebLibraries">dashboard/dashboard.bridge.js</isplacement>
+
+<!--- dashboard --->
+<isform action="#URL(Action('ViewDashboard-Dispatch'))#" method="post" name="updateDashboard">
+	<input type="hidden" value="#DashboardBO:ID#" name="DashboardID">
+
+	<div class="actions">
+		<div class="actions-group">
+			<input type="button" class="button js-dashboard-dialog-addwidget-open" name="addWidget" value="<istext key="dashboard.detail.button.addwidget"/>" data-action="dialog-open #'#'#dashboard-dialog-addwidget"/>
+			<input type="button" class="button button_select" id="editDashboardAction" value="<istext key="dashboard.detail.button.edit"/>" />
+			<isPopupmenu id="editDashboardAction" 
+					itemstemplate="dashboard/DashboardEdit">
+			
+		</div>
+	</div>
+	<h1 class="headline headline-top"><isprint value="#DashboardBO:DisplayName#"></h1>
+
+	<isplacement placeholderid="CSSWebLibraries">jquery/gridster/jquery.gridster.css</isplacement>
+	<isplacement placeholderid="CSSWebLibraries">dashboard/dashboard.css</isplacement>
+	<isplacement placeholderid="JSWebLibraries">jquery/gridster/jquery.gridster.js</isplacement>
+	<!--- will be dynamically filled by gridster --->
+	<div class="gridster">
+		<div id="dashboard-empty" class="headline headline-top-description">
+			<istext key="dashboard.detail.empty.message"/> <a href="#'#'#addwidget" class="js-dashboard-dialog-addwidget-open form_link" data-action="dialog-open #'#'#dashboard-dialog-addwidget"><istext key="dashboard.detail.empty.link.addwidgettype"/></a>
+		</div>
+		<ul id="dashboard"></ul>
+	</div>
+</isform>
+
+<!--- widget template is in a separate file --->
+<script type="text/template" id="widget-tpl">
+	<isinclude template="dashboard/WidgetTemplate">
+</script>
+
+<!--- dashboard rename dialog --->
+<div id="dashboard-dialog-rename" class="js-dialog" width="450" height="167" data-title="<istext key="dashboard.dialog.rename.title" />">
+	<iframe name="renameDashboardFrame" class="dialog-iframe js-dashboard-dialog-rename" src="<isprint value="#URL(Action('ViewDashboard-EnterName'), Parameter('DashboardID', DashboardBO:ID))#">" data-src="<isprint value="#URL(Action('ViewDashboard-EnterName'), Parameter('DashboardID', DashboardBO:ID))#">"></iframe>
+</div>
+
+<!--- dashboard delete confirmation dialog --->
+<div id="dashboard-dialog-deleteconfirmation" class="js-dialog" width="400" height="162" data-title="<istext key="dashboard.dialog.deleteconfirmation.title" />">
+	<isform action="#URL(Action('ViewDashboard-Dispatch'))#" method="post" name="deleteDashboard">
+		<div class="dialog-content">
+			<input type="hidden" value="#DashboardBO:ID#" name="DashboardID">
+			<table border="0" cellpadding="0" cellspacing="4" width="100%" class="confirm_box aldi">
+				<tr>
+					<td class="error_icon"><img src="#WebRoot()#/images/confirmation.gif" width="16" height="15" alt="" border="0"/></td>
+					<td>&nbsp;</td>
+					<td class="confirm"><istext key="dashboard.dialog.deleteconfirmation.question"/></td>
+				</tr>
+			</table>
+		</div>
+		<div class="dialog-buttons">
+			<input type="submit" class="button" name="delete" value="<istext key="dashboard.dialog.deleteconfirmation.button.ok"/>" /><input type="button" class="button js-dashboard-delete-cancel" name="cancel" value="<istext key="dashboard.dialog.deleteconfirmation.button.cancel"/>" data-focus data-action="dialog-close"/>
+		</div>
+	</isform>
+</div>
+
+<!--- widget delete confirmation dialog --->
+<div id="widget-dialog-deleteconfirmation" class="js-dialog" width="400" height="162" data-title="<istext key="widget.dialog.deleteconfirmation.title" />">
+	<isform action="#URL(Action('ViewDashboard-Dispatch'))#" method="post" name="deleteWidget">
+		<div class="dialog-content">
+			<table border="0" cellpadding="0" cellspacing="4" width="100%" class="confirm_box aldi">
+				<tr>
+					<td class="error_icon"><img src="#WebRoot()#/images/confirmation.gif" width="16" height="15" alt="" border="0"/></td>
+					<td>&nbsp;</td>
+					<td class="confirm"><istext key="widget.dialog.deleteconfirmation.question"/></td>
+				</tr>
+			</table>
+		</div>
+		<div class="dialog-buttons">
+			<input type="submit" class="button js-widget-delete-ok" name="deleteWidget" value="<istext key="widget.dialog.deleteconfirmation.button.ok"/>" /><input type="button" class="button js-widget-delete-cancel" name="cancel" value="<istext key="widget.dialog.deleteconfirmation.button.cancel"/>" data-focus data-action="dialog-close"/>
+		</div>
+	</isform>
+</div>
+
+<!--- add widget dialog --->
+<div id="dashboard-dialog-addwidget" class="js-dialog" width="635" height="550" data-title="<istext key="dashboard.dialog.addwidget.title" encoding="javascript" />">
+	<iframe name="addWidgetFrame" class="dialog-iframe js-dashboard-dialog-addwidget" src="<isprint value="#URL(Action('ViewDashboard-NewWidget'))#">"></iframe>
+</div>
+
+<!--- configure widget dialog --->
+<div id="widget-dialog-configuration" class="js-dialog" width="635" height="550" data-resizable="true" data-title="<istext key="widget.dialog.configuration.title" parameter0="{0}" encoding="javascript" />">
+	<iframe name="configureWidgetFrame" class="dialog-iframe" src="about:blank" data-src="<isprint value="#URL(Action('ViewDashboard-ConfigureWidget'))#">"></iframe>
+</div>
+
+<isplacement placeholderid="JSWebLibraries">dashboard/dashboard.addwidget.js</isplacement>
+<isplacement placeholderid="JSWebLibraries">dashboard/dashboard.init.js</isplacement>
+<script type="text/javascript">
+	(function () {
+		// dashboard uses other styling
+		$('body').addClass('dashboard');
+		
+		// initialize "add widget" dialog
+		initAddWidgetDialog();
+
+		// initialize dashboard
+		initDashboard({
+			token: $('input[name="SynchronizerToken"]:first').val(),
+			dashboardId: '<isprint value="#DashboardBO:ID#" encoding="javascript">',
+			dashboardColumns: 4,
+			widgetMargin: 6,
+			widgetHeight: 60,
+			widgetY: 3
+		});
+
+		// load widgets of dashboard
+		var $document = $(document);
+		<isset scope="request" name="WidgetBOs" value="#DashboardBO:WidgetBOs#">
+		<isloop iterator="WidgetBOs" alias="WidgetBO">
+			<isset scope="request" name="WidgetType" value="#WidgetBO:WidgetType#">
+			$document.trigger('loadwidget.dashboard', [
+				{
+					id: '<isprint value="#WidgetBO:ID#" encoding="javascript">',
+					typeId: '<isprint value="#WidgetType:ID#" encoding="javascript">',
+					<%@page import="com.intershop.component.dashboard.capi.WidgetBO" %>
+					<%@page import="com.intershop.sellside.enterprise.dashboard.internal.WidgetTypeUtil" %>
+					<%@page import="com.intershop.application.backoffice.dashboard.internal.WidgetBOUtil" %>
+					<%
+					WidgetBO widgetBO = (WidgetBO)getObject("WidgetBO");
+					
+					// url is only needed for URIs that don't reference a pipeline
+					String url = WidgetTypeUtil.getURL(widgetBO);
+					if (null != url)
+					{
+						getPipelineDictionary().put("WidgetTypeURL", url);
+						%>
+						url: '<isprint value="#WidgetTypeURL#" encoding="javascript">',
+						<%
+					}
+					
+					// displayName of the widget
+					getPipelineDictionary().put("WidgetDisplayName", WidgetBOUtil.getDisplayName(widgetBO));
+					%>
+					title: '<isprint value="#WidgetDisplayName#" encoding="javascript">'
+				},
+				{
+				<isset scope="request" name="WidgetPosition" value="#WidgetBO:Configuration("(Class)com.intershop.application.backoffice.dashboard.internal.Position")#">
+				<isif condition="#isDefined(WidgetPosition)#">
+					col: <isprint value="#WidgetPosition:X#" formatter="#" encoding="javascript">,
+					row: <isprint value="#WidgetPosition:Y#" formatter="#" encoding="javascript">,
+				</isif>
+				<isset scope="request" name="WidgetSize" value="#WidgetBO:Configuration("(Class)com.intershop.application.backoffice.dashboard.internal.Size")#">
+				<isif condition="#isDefined(WidgetSize)#">
+					width: <isprint value="#WidgetSize:Width#" formatter="#" encoding="javascript">,
+					height: <isprint value="#WidgetSize:Height#" formatter="#" encoding="javascript">
+				</isif>
+				}
+			]);
+		</isloop>
+	})();
+</script>

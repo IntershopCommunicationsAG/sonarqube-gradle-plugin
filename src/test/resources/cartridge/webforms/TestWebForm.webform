@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webform:WebForm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:webform="http://www.intershop.de/webform/2010" name="Dashboard">
+  <forms name="TestWebForm">
+    <parameters xsi:type="webform:FormParameter" name="DisplayName" type="java.lang.String"/>
+  </forms>
+</webform:WebForm>

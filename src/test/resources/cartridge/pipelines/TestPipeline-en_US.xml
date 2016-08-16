@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<DDescriptionContainer dbo.type="com.intershop.beehive.core.rapi.common.DDescriptionContainer">
+<localeId>en_US</localeId>
+<descriptions>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipelineDesc" id="Pipeline1"  localeId="en_US" >
+<group>TestPipeline</group>
+<description>This pipeline is used to to create, view, update and remove dashboards.</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletNodeDesc" id="FilterWidgetTypesByUserPermission0"  localeId="en_US" >
+<customName>Filter WidgetTypes of Category</customName>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletNodeDesc" id="FilterWidgetTypesByUserPermission1"  localeId="en_US" >
+<customName>Filter all WidgetTypes</customName>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletNodeDesc" id="GetWidgetTypesByCategory0"  localeId="en_US" >
+<customName>WidgetTypes of selected Category</customName>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletNodeDesc" id="GetWidgetTypesByCategory1"  localeId="en_US" >
+<customName>All available WidgetTypes</customName>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="InteractionEnd3"  localeId="en_US" >
+<description>[dialog] Show Dashboard creation mask</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="InteractionNode1"  localeId="en_US" >
+<description>[redirect] Show DashboardBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="InteractionNode10"  localeId="en_US" >
+<description>[dialog] Show Dashboard renaming mask</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="InteractionNode11"  localeId="en_US" >
+<description>[redirect] Show DashboardBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="Start2"  localeId="en_US" >
+<description>[dialog] Show Dashboard creation mask</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode10_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode11_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode11_param_WidgetID"  localeId="en_US" >
+<description>ID of the WidgetBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode12_param_DashboardID"  localeId="en_US" >
+<description>ID of the Dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode13_param_CurrentUserPermissionMap"  localeId="en_US" >
+<description>The current user permission within the current organization as determined in the prefix pipeline.</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="StartNode3"  localeId="en_US" >
+<description>[dialog] Show all registered WidgetTypes</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="StartNode4"  localeId="en_US" >
+<description>[ajax] Create a new WidgetBO based on a WidgetType</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode4_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode4_param_WidgetTypeID"  localeId="en_US" >
+<description>ID of the widgettype</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="StartNode5"  localeId="en_US" >
+<description>[ajax] Delete a WidgetBO for a given DashboardID and WidgetID</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode5_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode5_param_WidgetID"  localeId="en_US" >
+<description>ID of the WidgetBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="StartNode6"  localeId="en_US" >
+<description>[ajax] Save the arrangement of the given Widgets</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode6_param_WidgetData"  localeId="en_US" >
+<description>JSON string containing arrangement of widgets</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode6_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DNodeDesc" id="StartNode7"  localeId="en_US" >
+<description>[dialog] Show the configuration of the given Widget</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode7_param_WidgetID"  localeId="en_US" >
+<description>ID of the WidgetBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode7_param_DashboardID"  localeId="en_US" >
+<description>ID of the dashboard</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode8_param_WidgetID"  localeId="en_US" >
+<description>ID of the WidgetBO</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DStartParameterDesc" id="StartNode8_param_DashboardID"  localeId="en_US" >
+<description>ID of the DashboardBO</description>
+</DDescription>
+</descriptions>
+</DDescriptionContainer>

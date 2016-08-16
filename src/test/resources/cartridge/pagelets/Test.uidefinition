@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uidefinition:UIDefinitionModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:uidefinition="http://www.intershop.de/uidefinition/2010" name="Test">
+	<configurationParameterTypeUIDefinitions referencedType="bc_pmc:types.pagelet2-Html" context="channel" editingTemplate="content/ChannelHTMLParameterInc" descriptionTemplate="content/ParameterizableConfigurationParameterDescription" webForm="ConfigurationParameterTypes-Html" scriptHandler="js/UIScriptHandler.js-html"/>
+</uidefinition:UIDefinitionModel>

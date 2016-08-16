@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<DPipelet dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipelet" id="Pipelet1" >
+<pipeletName>TestPipelet</pipeletName>
+<pipeletClass>com.intershop.component.test.pipelet.test.TestPipelet</pipeletClass>
+<errorConnector>false</errorConnector>
+<properties>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeBundleProducts" >
+<key>ExcludeBundleProducts</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeBundledProducts" >
+<key>ExcludeBundledProducts</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeMasterProducts" >
+<key>ExcludeMasterProducts</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeMasteredProducts" >
+<key>ExcludeMasteredProducts</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeRetailSets" >
+<key>ExcludeRetailSets</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludePartOfRetailSets" >
+<key>ExcludePartOfRetailSets</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="config_ExcludeServiceTypes" >
+<key>ExcludeServiceTypes</key>
+<propertyClass>java.lang.Boolean</propertyClass>
+<group>config</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="dictionary-in_Products" >
+<key>Products</key>
+<input>required</input>
+<propertyClass>java.util.Iterator&lt;com.intershop.component.product.capi.ProductBO&gt;</propertyClass>
+<group>dictionary-in</group>
+</DPipeletProperty>
+<DPipeletProperty dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletProperty" id="dictionary-out_FilteredProducts" >
+<key>FilteredProducts</key>
+<output>guaranteed</output>
+<propertyClass>java.util.Iterator&lt;com.intershop.component.product.capi.ProductBO&gt;</propertyClass>
+<group>dictionary-out</group>
+</DPipeletProperty>
+</properties>
+</DPipelet>

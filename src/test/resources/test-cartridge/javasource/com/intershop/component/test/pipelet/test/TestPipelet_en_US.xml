@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<DDescriptionContainer dbo.type="com.intershop.beehive.core.rapi.common.DDescriptionContainer">
+<localeId>en_US</localeId>
+<descriptions>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletDesc" id="Pipelet1"  localeId="en_US" >
+<group>TestPipelet</group>
+<description>TestPipelet</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeBundleProducts"  localeId="en_US" >
+<description>Decide wether &quot;Product Bundles&quot; should be excluded from output product list or not
+</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeBundledProducts"  localeId="en_US" >
+<description>Decide wether &quot;Bundled Products&quot; should be excluded from output product list or not
+</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeMasterProducts"  localeId="en_US" >
+<description>Decide wether &quot;Master Products&quot; should be excluded from output product list or not		</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeMasteredProducts"  localeId="en_US" >
+<description>Decide wether &quot;Mastered Products&quot; should be excluded from output product list or not		</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeRetailSets"  localeId="en_US" >
+<description>Decide wether &quot;Retail Sets&quot; should be excluded from output product list or not</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludePartOfRetailSets"  localeId="en_US" >
+<description>Decide wether products that are &quot;Part of Retail Sets&quot; should be excluded from output product list or not</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="config_ExcludeServiceTypes"  localeId="en_US" >
+<description>Decide w	ether products that are &quot;ServiceTypes&quot; (e.g. Warranty, Proxy) should be excluded from output product list or not</description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="dictionary-in_Products"  localeId="en_US" >
+<description>Iterator of all products </description>
+</DDescription>
+<DDescription dbo.type="com.intershop.beehive.core.rapi.pipeline.DPipeletPropertyDesc" id="dictionary-out_FilteredProducts"  localeId="en_US" >
+<description>Iterator of filtered products where all product types marked as &quot;Exclude...&quot; defined as Configuration values are filtered out.	</description>
+</DDescription>
+</descriptions>
+</DDescriptionContainer>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query description="TestQuery">
+<parameters>
+	<parameter name="ChannelRepositoryDomain" type="com.intershop.beehive.core.capi.domain.Domain" optional="false"/>
+	<parameter name="SimpleSearchExpression" type="com.intershop.component.foundation.capi.search.SearchExpression" optional="true"/>
+	<parameter name="LocaleID" type="java.lang.String" optional="true"/>
+</parameters>
+<return-mappings>
+	<return-mapping name="Application" type="orm" class="com.intershop.beehive.core.internal.domain.ApplicationPO">
+		<return-attribute name="ApplicationUUID"/>
+	</return-mapping>
+</return-mappings>
+<processor name="OracleSQL">
+</processor>
+<template type="countedobjects">
+	SELECT
+		a.uuid AS ApplicationUUID,
+		COUNT(*) over() AS rowcount
+	FROM
+		application a
+		<template-if condition="isDefined(LocaleID)">
+			<template-if condition="isDefined(SimpleSearchExpression)">
+			, application_av av
+			</template-if>
+		</template-if>
+	WHERE
+		a.DomainID=<template-variable value="ChannelRepositoryDomain:UUID"/>
+		<template-if condition="isDefined(LocaleID)">
+			<template-if condition="isDefined(SimpleSearchExpression)">
+				AND av.ownerID=a.uuid
+				AND av.name=&apos;displayName&apos;
+				AND av.localeid=<template-variable value="LocaleID"/>
+				<template-call name="inc/SearchExpression2Like"><call-parameter name="SearchExpression" value="SimpleSearchExpression"/><call-parameter name="ColumnNames" value="&quot;a.appid av.stringvalue&quot;"/><call-parameter name="CaseInsensitive" value="true()"/><call-parameter name="ConcatenationOperator" value="&quot; AND &quot;"/></template-call>
+				ORDER BY upper(av.stringValue) ASC
+			</template-if>
+		<if-elseif condition="isDefined(SimpleSearchExpression)"/>
+			<template-call name="inc/SearchExpression2Like"><call-parameter name="SearchExpression" value="SimpleSearchExpression"/><call-parameter name="ColumnNames" value="&quot;a.appid&quot;"/><call-parameter name="CaseInsensitive" value="true()"/><call-parameter name="ConcatenationOperator" value="&quot; AND &quot;"/></template-call>
+		</template-if>
+</template>
+</query>
