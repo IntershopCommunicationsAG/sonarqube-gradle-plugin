@@ -1,6 +1,5 @@
 = Gradle SonarQube Plugin for Intershop Components
-:latestRevision: 1.0.0
-:toc:
+:latestRevision: 1.0.1
 
 == Summary
 
@@ -21,7 +20,9 @@ To apply the Intershop SonarQube plugin to your Intershop projects, add the foll
 
 [source,groovy,subs="attributes"]
 ----
-apply plugin: 'intershop-sonar'
+plugins {
+   id 'com.intershop.gradle.sonarQube' version '{latestRevision}'
+}
 
 sonarqube {
 
@@ -34,12 +35,6 @@ sonarqube {
         //property 'sonar.password', '<login password>'
     }
 
-}
-
-buildscript {
-    dependencies {
-        classpath group: 'com.intershop.build', name: 'intershop-sonar-plugin', version: '{latestRevision}'
-    }
 }
 ----
 
@@ -67,7 +62,7 @@ subprojects {
 
     // supposed, the name of your asemblies are stored within a collection
     if (!assemblies.contains(name)) {
-        apply plugin: 'com.intershop.build.sonarQube'
+        apply plugin: 'com.intershop.gradle.sonarQube'
 
         tasks.sonarqube.dependsOn collectIntegCoverageDataTask
 
