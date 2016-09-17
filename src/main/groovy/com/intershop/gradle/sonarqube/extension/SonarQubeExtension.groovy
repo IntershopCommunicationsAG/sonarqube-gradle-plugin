@@ -32,7 +32,7 @@ class SonarQubeExtension {
     public final static String RUNONCI_PRJ = 'runOnCI'
 
     // default version of Sonar Runner
-    public static final String DEFAULT_SONAR_RUNNER_VERSION = '2.5.1'
+    public static final String DEFAULT_SONAR_RUNNER_VERSION = '2.7'
 
     // names for the plugin
     public static final String SONARQUBE_CONFIGURATION_NAME = "sonarqube"

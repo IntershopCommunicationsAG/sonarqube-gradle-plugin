@@ -91,7 +91,8 @@ This plugin adds an extension `sonarqube` to the project.
 |Property | Type | Default value | Description
 
 |*modules*     |`List`     | ['java','js','css'] | This is a list of possible configurations. Remove 'js' or' css, if only Java should to be analyzed.
-|*runOnCI*     |`boolean`  | false               | This configuration must be true, if the project is used on a CI server. +
+|*runOnCI*     |`boolean`  | false               | If this value ist true, the result and sources are written to the SonarQube server, otherwise the analysis will run in a preview mode.
+                                                   So it should be true on the CI server. +
                                                    _This can be overwritten by the system or environment variable `RUNONCI` or project property `runOnCI`._
 |*toolVersion* |`String`   | '2.5.1'               | The version of the SonarQube Runner. (See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner)
 |*skipProject* |`boolean`  | false               | If this value is true, the project will be not analyzed.

@@ -197,7 +197,7 @@ pluginBundle {
 
     plugins {
         gradleTestPlugin {
-            id = 'com.intershop.gradle.sonarqube'
+            id = 'com.intershop.gradle.sonarQube'
             displayName = project.description
         }
     }
