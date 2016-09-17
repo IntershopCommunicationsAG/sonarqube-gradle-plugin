@@ -91,7 +91,7 @@ class SonarQubeRunner  extends DefaultTask {
 
             List<String> args = []
 
-            if(properties.containsKey('sonar.verbose') && properties.get('sonar.verbose')) {
+            if(properties.containsKey('sonar.verbose') && Boolean.getBoolean(properties.get('sonar.verbose').toString()) ) {
                 args.add('--debug')
                 args.add('--errors')
             }
