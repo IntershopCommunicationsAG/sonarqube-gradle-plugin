@@ -280,8 +280,8 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         //check sonar scan
         result.output.contains('INFO: EXECUTION SUCCESS')
         ! result.output.contains('INFO: EXECUTION FAILED')
-        ! result.output.contains('Scan Javascript trunk')
-        ! result.output.contains('Scan CSS trunk')
+        ! result.output.contains('Scan Javascript')
+        ! result.output.contains('Scan CSS')
 
         result.output.contains('Sensor JaCoCoSensor')
         result.output.contains("jacoco${FileSystems.getDefault().getSeparator()}test.exec")
@@ -327,8 +327,8 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         //check sonar scan
         result.output.contains('INFO: EXECUTION SUCCESS')
         ! result.output.contains('INFO: EXECUTION FAILED')
-        result.output.contains('Scan Javascript trunk')
-        ! result.output.contains('Scan CSS trunk')
+        result.output.contains('Scan Javascript')
+        ! result.output.contains('Scan CSS')
 
         ! result.output.contains('Sensor JaCoCoOverallSensor...')
 
@@ -371,8 +371,8 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         //check sonar scan
         result.output.contains('INFO: EXECUTION SUCCESS')
         ! result.output.contains('INFO: EXECUTION FAILED')
-        result.output.contains('Scan Javascript trunk')
-        result.output.contains('Scan CSS trunk')
+        result.output.contains('Scan Javascript')
+        result.output.contains('Scan CSS')
 
         ! result.output.contains('Sensor JaCoCoOverallSensor...')
         ! result.output.contains('Sensor JaCoCoSensor...')
@@ -451,8 +451,8 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
 
         result.output.contains('INFO: EXECUTION SUCCESS')
         ! result.output.contains('INFO: EXECUTION FAILED')
-        result.output.contains('Scan Javascript trunk')
-        result.output.contains('Scan CSS trunk')
+        result.output.contains('Scan Javascript')
+        result.output.contains('Scan CSS')
 
         where:
         gradleVersion << supportedGradleVersions
@@ -498,8 +498,8 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
 
         result.output.contains('INFO: EXECUTION SUCCESS')
         ! result.output.contains('INFO: EXECUTION FAILED')
-        result.output.contains('Scan Javascript trunk')
-        result.output.contains('Scan CSS trunk')
+        result.output.contains('Scan Javascript')
+        result.output.contains('Scan CSS')
 
         where:
         gradleVersion << supportedGradleVersions

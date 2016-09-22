@@ -1,5 +1,5 @@
 = Gradle SonarQube Plugin for Intershop Components
-:latestRevision: 1.0.1
+:latestRevision: 2.0.0
 
 == Summary
 
@@ -80,7 +80,7 @@ subprojects {
 == Tasks
 The Intershop SonarQube plugin adds the task `sonarqube` to all projects. The task will be only executed for sub projects.
 
-NOTE: It is necessary for the analysis to specify the project property `branchVersion`. If this is not specified, `trunk` is used instead.
+NOTE: If the property `branchVersion` is not specified, the SonarQube property `sonar.branch` will be empty and the project version is used for `sonar.version`.
 
 == Project Extension 'sonarqube'
 This plugin adds an extension `sonarqube` to the project.

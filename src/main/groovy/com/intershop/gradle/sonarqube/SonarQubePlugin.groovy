@@ -146,9 +146,21 @@ class SonarQubePlugin implements Plugin<Project> {
         properties.put('sonar.projectDescription', project.description ?: '')
         properties.put('sonar.projectBaseDir', project.projectDir)
 
-        String branchVersion = project.hasProperty('branchVersion') && project.ext.branchVersion ? project.ext.branchVersion : 'trunk'
-        properties.put('sonar.branch', branchVersion)
-        properties.put('sonar.projectVersion', branchVersion)
+        if(project.hasProperty('branchVersion') && project.ext.branchVersion) {
+            properties.put('sonar.branch', project.ext.branchVersion)
+            properties.put('sonar.projectVersion', project.ext.branchVersion)
+        } else {
+            String projectVersion = project.getVersion().toString()
+            String pVersion = projectVersion
+
+            if(projectVersion.contains('-SNAPSHOT')) {
+                pVersion = projectVersion - '-SNAPSHOT'
+            }
+            if(projectVersion.contains('-LOCAL')) {
+                pVersion = projectVersion - '-LOCAL'
+            }
+            properties.put('sonar.projectVersion', pVersion)
+        }
 
         properties.put('sonar.working.directory', new File(project.buildDir, 'sonarqube'))
         properties.put('sonar.environment.information.key', 'Gradle')
