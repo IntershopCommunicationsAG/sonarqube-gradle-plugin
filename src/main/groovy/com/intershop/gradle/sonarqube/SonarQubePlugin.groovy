@@ -28,7 +28,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.testing.Test
-import org.gradle.internal.jvm.Jvm
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
@@ -223,10 +222,16 @@ class SonarQubePlugin implements Plugin<Project> {
                 properties.put('sonar.java.binaries', nonEmptyOrNull(main.getRuntimeClasspath().findAll {it.isDirectory()}.toList()))
 
                 List<File> mainLibs = main.getRuntimeClasspath().findAll {it.exists() && (! it.isDirectory()) && (it.getName().endsWith('.jar') || it.getName().endsWith('.zip'))}.toList()
-                File runtimeJar = Jvm.current().getRuntimeJar()
+
+                File runtimeJar = getRuntimeJar()
                 if (runtimeJar != null) {
                     mainLibs.add(runtimeJar)
                 }
+                File fxRuntimeJar = getFxRuntimeJar()
+                if (fxRuntimeJar != null) {
+                    mainLibs.add(fxRuntimeJar)
+                }
+
                 properties.put('sonar.java.libraries', nonEmptyOrNull(mainLibs))
 
                 List<File> newTestDirs = []
@@ -282,6 +287,35 @@ class SonarQubePlugin implements Plugin<Project> {
                 properties.put('pipelets.sonar.language', 'pplet')
             }
         }
+    }
+
+    private static File getRuntimeJar() {
+        try {
+            final File javaBase = new File(System.getProperty("java.home")).getCanonicalFile()
+            File runtimeJar = new File(javaBase, "lib/rt.jar")
+            if (runtimeJar.exists()) {
+                return runtimeJar
+            }
+            runtimeJar = new File(javaBase, "jre/lib/rt.jar")
+            return runtimeJar.exists() ? runtimeJar : null;
+        } catch (IOException e) {
+            throw new IllegalStateException(e)
+        }
+    }
+
+    private static File getFxRuntimeJar() {
+        try {
+            final File javaBase = new File(System.getProperty("java.home")).getCanonicalFile()
+            File runtimeJar = new File(javaBase, "lib/ext/jfxrt.jar")
+            if (runtimeJar.exists()) {
+                return runtimeJar
+            }
+            runtimeJar = new File(javaBase, "jre/lib/ext/jfxrt.jar")
+            return runtimeJar.exists() ? runtimeJar : null
+        } catch (IOException e) {
+            throw new IllegalStateException(e)
+        }
+
     }
 
     /**
