@@ -28,7 +28,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.testing.Test
-import org.gradle.internal.jvm.Jvm
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
@@ -147,9 +146,21 @@ class SonarQubePlugin implements Plugin<Project> {
         properties.put('sonar.projectDescription', project.description ?: '')
         properties.put('sonar.projectBaseDir', project.projectDir)
 
-        String branchVersion = project.hasProperty('branchVersion') && project.ext.branchVersion ? project.ext.branchVersion : 'trunk'
-        properties.put('sonar.branch', branchVersion)
-        properties.put('sonar.projectVersion', branchVersion)
+        if(project.hasProperty('branchVersion') && project.ext.branchVersion) {
+            properties.put('sonar.branch', project.ext.branchVersion)
+            properties.put('sonar.projectVersion', project.ext.branchVersion)
+        } else {
+            String projectVersion = project.getVersion().toString()
+            String pVersion = projectVersion
+
+            if(projectVersion.contains('-SNAPSHOT')) {
+                pVersion = projectVersion - '-SNAPSHOT'
+            }
+            if(projectVersion.contains('-LOCAL')) {
+                pVersion = projectVersion - '-LOCAL'
+            }
+            properties.put('sonar.projectVersion', pVersion)
+        }
 
         properties.put('sonar.working.directory', new File(project.buildDir, 'sonarqube'))
         properties.put('sonar.environment.information.key', 'Gradle')
@@ -223,10 +234,16 @@ class SonarQubePlugin implements Plugin<Project> {
                 properties.put('sonar.java.binaries', nonEmptyOrNull(main.getRuntimeClasspath().findAll {it.isDirectory()}.toList()))
 
                 List<File> mainLibs = main.getRuntimeClasspath().findAll {it.exists() && (! it.isDirectory()) && (it.getName().endsWith('.jar') || it.getName().endsWith('.zip'))}.toList()
-                File runtimeJar = Jvm.current().getRuntimeJar()
+
+                File runtimeJar = getRuntimeJar()
                 if (runtimeJar != null) {
                     mainLibs.add(runtimeJar)
                 }
+                File fxRuntimeJar = getFxRuntimeJar()
+                if (fxRuntimeJar != null) {
+                    mainLibs.add(fxRuntimeJar)
+                }
+
                 properties.put('sonar.java.libraries', nonEmptyOrNull(mainLibs))
 
                 List<File> newTestDirs = []
@@ -282,6 +299,35 @@ class SonarQubePlugin implements Plugin<Project> {
                 properties.put('pipelets.sonar.language', 'pplet')
             }
         }
+    }
+
+    private static File getRuntimeJar() {
+        try {
+            final File javaBase = new File(System.getProperty("java.home")).getCanonicalFile()
+            File runtimeJar = new File(javaBase, "lib/rt.jar")
+            if (runtimeJar.exists()) {
+                return runtimeJar
+            }
+            runtimeJar = new File(javaBase, "jre/lib/rt.jar")
+            return runtimeJar.exists() ? runtimeJar : null;
+        } catch (IOException e) {
+            throw new IllegalStateException(e)
+        }
+    }
+
+    private static File getFxRuntimeJar() {
+        try {
+            final File javaBase = new File(System.getProperty("java.home")).getCanonicalFile()
+            File runtimeJar = new File(javaBase, "lib/ext/jfxrt.jar")
+            if (runtimeJar.exists()) {
+                return runtimeJar
+            }
+            runtimeJar = new File(javaBase, "jre/lib/ext/jfxrt.jar")
+            return runtimeJar.exists() ? runtimeJar : null
+        } catch (IOException e) {
+            throw new IllegalStateException(e)
+        }
+
     }
 
     /**
