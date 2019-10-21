@@ -137,7 +137,7 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         sonarqube {
             sonarProperties {
                 property 'sonar.test', 'test'
-                property 'sonar.modules', 'test'
+                property 'sonar.modules', 'java, test'
 
                 property 'test.sonar.projectName', 'Javascript'
                 property 'test.sonar.sources', 'js'
@@ -151,6 +151,7 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
 
         writeJavaTestClass('com.intershop.multi', subProject)
         copyResources('cartridge/static/default/js/test','js/test', subProject)
+        copyResources('cartridge/static/default/js/test','jscript/test', subProject)
 
         return subProject
     }
@@ -166,6 +167,34 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
             sonarProperties {
                 property 'sonar.test', 'test'
                 property 'sonar.verbose', 'true'
+            }
+        }
+        """)
+
+        writeJavaTestClass('com.intershop.comp1', subProject)
+        writeJavaTestClass('com.intershop.comp2', subProject)
+
+        copyResources('cartridge','staticfiles/cartridge', subProject)
+        copyResources('test-cartridge/javasource','test-cartridge/javasource/com/intershop/component', subProject)
+
+        return subProject
+    }
+
+    /*
+Project with intershop artifacts
+ */
+    private File createSubProject_intershopComponentChangedDefaults(String projectPath, File settingsGradle) {
+        File subProject = createSubProject(projectPath, settingsGradle,
+                """
+        ${buildFileContentBase}
+        sonarqube {
+            modules = ['js','css']
+
+            sonarProperties {
+                property 'sonar.test', 'test'
+                property 'sonar.verbose', 'true'
+                property 'js.sonar.sources', 'staticfiles/cartridge/static/default/js'
+                property 'js.sonar.projectBaseDir', project.projectDir
             }
         }
         """)
@@ -286,8 +315,6 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         result.output.contains('Sensor JaCoCoSensor')
         result.output.contains("jacoco${FileSystems.getDefault().getSeparator()}test.exec")
 
-
-
         where:
         gradleVersion << supportedGradleVersions
     }
@@ -307,7 +334,7 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
 
         def result = getPreparedGradleRunner()
                 .withArguments(jvmArgs + args)
-                //.withGradleVersion(gradleVersion)
+                .withGradleVersion(gradleVersion)
                 .build()
 
         Properties props = getSonarProjectProperties(subProject)
@@ -318,9 +345,13 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
 
         // check properties
         props.getProperty('sonar.modules').split(',').size() == 2
+        props.getProperty('sonar.modules').split(',').each {
+            print("|" + it + "|")
+        }
         props.getProperty('sonar.modules').split(',').contains('test')
         props.getProperty('sonar.modules').split(',').contains('java')
         props.getProperty('test.sonar.language') == 'js'
+        props.getProperty('test.sonar.sources') == 'js'
 
         props.getProperty('sonar.test') == 'test'
 
@@ -331,6 +362,39 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         ! result.output.contains('Scan CSS')
 
         ! result.output.contains('Sensor JaCoCoOverallSensor...')
+
+        when:
+        File newBuildFile = new File(subProject, "build.gradle")
+        newBuildFile.delete()
+
+        newBuildFile << """
+        ${buildFileContentBase}
+
+        sonarqube {
+            sonarProperties {
+                property 'sonar.test', 'test'
+                property 'sonar.modules', 'test'
+
+                property 'test.sonar.projectName', 'Javascript'
+                property 'test.sonar.sources', 'jscript'
+                property 'test.sonar.projectBaseDir', projectDir.absolutePath
+                property 'test.sonar.language', 'js'
+
+                property 'sonar.verbose', 'true'
+            }
+        }
+        """
+
+        def newResult = getPreparedGradleRunner()
+                .withArguments(jvmArgs + args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        Properties newProps = getSonarProjectProperties(subProject)
+
+        then:
+        newProps.getProperty('sonar.modules').split(',').contains('test')
+        newProps.getProperty('test.sonar.sources') == 'jscript'
 
         where:
         gradleVersion << supportedGradleVersions
@@ -380,6 +444,42 @@ class SonarQubeTaskSpec extends AbstractIntegrationSpec {
         where:
         gradleVersion << supportedGradleVersions
     }
+
+    @Requires({
+        System.properties['sonarHostUrl']
+    })
+    def 'Test Intershop sonar - intershop component with changed defaults #gradleVersion'(gradleVersion) {
+        given:
+        File settingsGradle = file('settings.gradle')
+        File subProject = createSubProject_intershopComponentChangedDefaults(':set_2:project_2b', settingsGradle)
+
+        when:
+        List<String> jvmArgs = ["-Dsonar.host.url=${System.properties['sonarHostUrl']}".toString()]
+
+        List<String> args = ['sonarqube', '-s', '-i']
+
+        def result = getPreparedGradleRunner()
+                .withArguments(jvmArgs + args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        Properties props = getSonarProjectProperties(subProject)
+
+        then:
+        ! result.tasks.contains(':set_2:project_2a:sonarqube')
+        result.task(':set_2:project_2b:sonarqube').outcome == SUCCESS
+
+        // check properties
+        props.getProperty('sonar.modules').split(',').size() == 2
+        props.getProperty('sonar.modules').split(',').contains('css')
+        props.getProperty('sonar.modules').split(',').contains('js')
+
+        props.getProperty('js.sonar.sources').endsWith('staticfiles/cartridge/static/default/js')
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
 
     @Requires({
         System.properties['sonarHostUrl']

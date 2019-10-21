@@ -31,6 +31,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
+import static org.gradle.util.CollectionUtils.join
 import static org.gradle.util.CollectionUtils.nonEmptyOrNull
 /**
  * This is the plugin implementation of a SonarQubeRunner for Intershop projects.
@@ -89,9 +90,7 @@ class SonarQubePlugin implements Plugin<Project> {
         task.onlyIf { ! extension.skipProject && ! project.hasProperty('skipSonar')}
 
         task.conventionMapping.sonarProperties = {
-            Map<String, Object> properties = extension.getSonarProperties().properties
-            computeSonarProperties(project, properties)
-            return properties
+            return computeSonarProperties(project, extension.getSonarProperties().properties)
         }
 
         task.dependsOn {
@@ -107,7 +106,7 @@ class SonarQubePlugin implements Plugin<Project> {
      * @param project
      * @param properties
      */
-    private void computeSonarProperties(Project project, Map<String, Object> properties) {
+    private Map<String, Object> computeSonarProperties(Project project, Map<String, Object> properties) {
         if (extension.isSkipProject()) {
             return;
         }
@@ -118,19 +117,26 @@ class SonarQubePlugin implements Plugin<Project> {
 
         if(properties.get('sonar.modules')) {
             properties.get('sonar.modules').split(',').each {
-                modules.add(it)
+                modules.add(it.toString().trim())
             }
         }
 
         configureProject(project, rawProperties)
         configureJava(project, extension.getModules(), rawProperties, modules)
+
         configureIntershopArtifacts(project, extension.getModules(), rawProperties, modules)
         configureSonarProperties(rawProperties)
         addSystemProperties(rawProperties)
 
         rawProperties.put('sonar.modules', modules.unique())
 
-        convertProperties(rawProperties, properties)
+        properties.each { String key, Object value ->
+            if(key != 'sonar.modules') {
+                rawProperties.put(key, value)
+            }
+        }
+
+        return convertProperties(rawProperties)
     }
 
     /**
@@ -345,8 +351,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_PAGELETS)
 
             properties.put('pagelets.sonar.projectName', 'Pagelets')
-            properties.put('pagelets.sonar.sources', cfolders.pageletsFolder.absolutePath)
-            properties.put('pagelets.sonar.projectBaseDir', cfolders.pageletsFolder.absolutePath)
+            properties.put('pagelets.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.PAGELETS_FOLDER}")
+            properties.put('pagelets.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('pagelets.sonar.language', 'pglet')
         }
 
@@ -354,8 +360,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_TEMPLATES)
 
             properties.put('templates.sonar.projectName', 'Templates')
-            properties.put('templates.sonar.sources', cfolders.templatesFolder.absolutePath)
-            properties.put('templates.sonar.projectBaseDir', cfolders.templatesFolder.absolutePath)
+            properties.put('templates.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.TEMPLATES_FOLDER}")
+            properties.put('templates.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('templates.sonar.language', 'isml')
         }
 
@@ -363,8 +369,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_PIPELINES)
 
             properties.put('pipelines.sonar.projectName', 'Pipelines')
-            properties.put('pipelines.sonar.sources', cfolders.pipelinesFolder.absolutePath)
-            properties.put('pipelines.sonar.projectBaseDir', cfolders.pipelinesFolder.absolutePath)
+            properties.put('pipelines.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.PIPELINES_FOLDER}")
+            properties.put('pipelines.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('pipelines.sonar.language', 'pline')
         }
 
@@ -372,8 +378,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_JAVASCRIPT)
 
             properties.put('js.sonar.projectName', 'Javascript')
-            properties.put('js.sonar.sources', cfolders.staticFolder.absolutePath)
-            properties.put('js.sonar.projectBaseDir', cfolders.staticFolder.absolutePath)
+            properties.put('js.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.STATIC_FOLDER}")
+            properties.put('js.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('js.sonar.language', 'js')
         }
 
@@ -381,8 +387,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_CSSFILES)
 
             properties.put('css.sonar.projectName', 'CSS')
-            properties.put('css.sonar.sources', cfolders.staticFolder.absolutePath)
-            properties.put('css.sonar.projectBaseDir', cfolders.staticFolder.absolutePath)
+            properties.put('css.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.STATIC_FOLDER}")
+            properties.put('css.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('css.sonar.language', 'css')
         }
 
@@ -390,8 +396,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_QUERIES)
 
             properties.put('queries.sonar.projectName', 'Query')
-            properties.put('queries.sonar.sources', cfolders.queriesFolder.absolutePath)
-            properties.put('queries.sonar.projectBaseDir', cfolders.queriesFolder.absolutePath)
+            properties.put('queries.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.QUERIES_FOLDER}")
+            properties.put('queries.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('queries.sonar.language', 'query')
         }
 
@@ -399,8 +405,8 @@ class SonarQubePlugin implements Plugin<Project> {
             modules.add(INTERSHOP_WEBFRORMS)
 
             properties.put('webforms.sonar.projectName', 'Webform')
-            properties.put('webforms.sonar.sources', cfolders.webformsFolder.absolutePath)
-            properties.put('webforms.sonar.projectBaseDir', cfolders.webformsFolder.absolutePath)
+            properties.put('webforms.sonar.sources', "${CartridgeFolders.STATICFILES_FOLDER}/${CartridgeFolders.CARTRIDGE_FOLDER}/${CartridgeFolders.WEBFORMS_FOLDER}")
+            properties.put('webforms.sonar.projectBaseDir', project.projectDir.absolutePath)
             properties.put('webforms.sonar.language', 'webfm')
         }
     }
@@ -411,10 +417,14 @@ class SonarQubePlugin implements Plugin<Project> {
      * @param rawProperties
      * @param properties
      */
-    private void convertProperties(Map<String, Object> rawProperties, final Map<String, Object> properties) {
+    private Map<String, Object> convertProperties(Map<String, Object> rawProperties) {
+        Map<String, Object> returnProperties = [:]
+
         rawProperties.each { key, value ->
-            properties.put(key, convertValue(value))
+            returnProperties.put(key, convertValue(value))
         }
+
+        return returnProperties
     }
 
     /**

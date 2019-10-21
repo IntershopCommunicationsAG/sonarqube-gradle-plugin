@@ -87,6 +87,11 @@ class SonarQubeRunner  extends DefaultTask {
             Properties propertiesObject = new Properties()
             propertiesObject.putAll(properties)
             File propertyFile = new File(getTemporaryDir(), "sonar-project.properties")
+
+            // the property file must be deleted
+            //if(propertyFile.exists()){
+             //   propertyFile.delete()
+            //}
             GUtil.saveProperties(propertiesObject, propertyFile)
 
             List<String> args = []
