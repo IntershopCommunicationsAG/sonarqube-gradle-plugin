@@ -164,7 +164,7 @@ pluginBundle {
     website = "https://github.com/IntershopCommunicationsAG/${project.name}"
     vcsUrl = "https://github.com/IntershopCommunicationsAG/${project.name}"
     description = project.description
-    tags = ['intershop', 'gradle', 'plugin', 'sonarqube', 'build', 'code', 'analysis']
+    tags = ['intershop', 'sonarqube', 'build', 'code', 'analysis']
 
     plugins {
         gradleTestPlugin {
